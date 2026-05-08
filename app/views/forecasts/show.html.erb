@@ -1,0 +1,106 @@
+<%# ============================================================
+    forecasts/show.html.erb – Forecast result page
+    Rendered by ForecastsController#show on success.
+    Receives: @forecast [Forecast]
+    ============================================================ %>
+
+<% forecast  = @forecast %>
+<% location  = forecast.location %>
+
+<div class="row justify-content-center mt-2">
+  <div class="col-md-9 col-lg-7">
+
+    <%# Back link %>
+    <div class="mb-3">
+      <%= link_to root_path, class: 'btn btn-outline-secondary btn-sm' do %>
+        <i class="bi bi-arrow-left"></i> Search Again
+      <% end %>
+    </div>
+
+    <%# ── Cache indicator ─────────────────────────────────────────────────── %>
+    <% if forecast.cached? %>
+      <div class="cache-badge d-flex align-items-center gap-2 px-3 py-2 mb-3">
+        <i class="bi bi-database-check-fill"></i>
+        <span>
+          <strong>Served from cache</strong> &mdash;
+          Results for zip code <strong><%= location.zip_code %></strong>
+          are cached for 30 minutes.
+        </span>
+      </div>
+    <% end %>
+
+    <% if forecast.stale? %>
+      <div class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>
+          Live weather data is temporarily unavailable. Showing the last known forecast for this zip code.
+        </span>
+      </div>
+    <% end %>
+
+    <%# ── Current Conditions card ──────────────────────────────────────────── %>
+    <div class="card shadow forecast-card mb-4">
+      <div class="card-body p-4">
+
+        <%# Location name %>
+        <p class="text-muted mb-1">
+          <i class="bi bi-geo-alt-fill text-danger"></i>
+          <%= location.display_name %>
+        </p>
+
+        <%# Primary temperature %>
+        <div class="temp-display text-primary"><%= forecast.current_temp %>°F</div>
+        <p class="lead text-secondary mt-1 mb-3"><%= forecast.condition %></p>
+
+        <%# Feels-like / High / Low stats %>
+        <div class="row text-center g-2">
+          <div class="col-4">
+            <div class="stat-label">Feels Like</div>
+            <div class="fs-4 fw-semibold"><%= forecast.feels_like %>°F</div>
+          </div>
+          <div class="col-4">
+            <div class="stat-label">Today's High</div>
+            <div class="fs-4 fw-semibold text-danger"><%= forecast.high_temp %>°F</div>
+          </div>
+          <div class="col-4">
+            <div class="stat-label">Today's Low</div>
+            <div class="fs-4 fw-semibold text-primary"><%= forecast.low_temp %>°F</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <%# ── Extended Forecast card ───────────────────────────────────────────── %>
+    <% if forecast.extended_forecast.any? %>
+      <div class="card shadow forecast-card">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-calendar3"></i> 6-Day Forecast
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3">Day</th>
+                <th>Condition</th>
+                <th class="text-danger text-end pe-3">High</th>
+                <th class="text-primary text-end pe-3">Low</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% forecast.extended_forecast.each do |day| %>
+                <tr class="day-row">
+                  <td class="ps-3 fw-semibold"><%= day.date.strftime('%A, %b %-d') %></td>
+                  <td class="text-muted"><%= day.condition %></td>
+                  <td class="text-danger text-end pe-3"><%= day.high_temp %>°F</td>
+                  <td class="text-primary text-end pe-3"><%= day.low_temp %>°F</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
+</div>

@@ -1,0 +1,55 @@
+<%# ============================================================
+    forecasts/index.html.erb – Address search form
+    Displayed on the root route (GET /).
+    Also re-rendered by ForecastsController#show on error.
+    ============================================================ %>
+
+<div class="row justify-content-center mt-4">
+  <div class="col-md-7 col-lg-5">
+    <div class="card shadow forecast-card p-4 p-md-5">
+
+      <div class="text-center mb-4">
+        <i class="bi bi-cloud-sun-fill text-primary" style="font-size: 3.5rem;"></i>
+        <h1 class="h3 fw-bold mt-2">Get Your Forecast</h1>
+        <p class="text-muted">Enter any US address to see current conditions and a 6-day outlook.</p>
+      </div>
+
+      <%# Flash alert (e.g. blank address redirect) %>
+      <% if alert.present? %>
+        <div class="alert alert-warning d-flex align-items-center" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <%= alert %>
+        </div>
+      <% end %>
+
+      <%# Service error (geocoding / API failure) %>
+      <% if @error.present? %>
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+          <i class="bi bi-x-circle-fill me-2"></i>
+          <%= @error %>
+        </div>
+      <% end %>
+
+      <%# Address search form – GET so the address appears in the URL %>
+      <%= form_with url: forecast_path, method: :get, class: 'd-flex flex-column gap-3' do |f| %>
+        <div>
+          <%= f.label :address, 'Street Address', class: 'form-label fw-semibold' %>
+          <%= f.text_field :address,
+                value: params[:address],
+                placeholder: '1600 Pennsylvania Ave, Washington, DC 20500',
+                class: 'form-control form-control-lg',
+                autocomplete: 'street-address',
+                required: true %>
+          <div class="form-text">
+            Include city and state or zip code for best results.
+          </div>
+        </div>
+
+        <%= f.submit 'Get Forecast',
+              class: 'btn btn-primary btn-lg w-100',
+              data: { disable_with: 'Looking up…' } %>
+      <% end %>
+
+    </div>
+  </div>
+</div>
